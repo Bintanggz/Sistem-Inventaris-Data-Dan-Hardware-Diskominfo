@@ -1,0 +1,66 @@
+﻿
+   INFO  Seeding database.  
+
+  Database\Seeders\RoleSeeder  RUNNING  
+  Database\Seeders\RoleSeeder  34 ms DONE  
+
+  Database\Seeders\UserSeeder  RUNNING  
+php : PHP Fatal error:  
+Trait "Laravel\Sanctum\Has
+ApiTokens" not found in C:
+\xampp\htdocs\SI-INDAH\bac
+kend\app\Models\User.php 
+on line 13
+At line:1 char:1
++ php artisan db:seed 
+2>&1 | Out-File -FilePath 
+"seed_log.txt" -Encodin 
+...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (P  
+  HP Fatal error....php   
+  on line 13:String) [    
+], RemoteException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+
+   Symfony\Component\ErrorHandler\Error\FatalError 
+
+  Trait "Laravel\Sanctum\HasApiTokens" not found
+
+  at app\Models\User.php:13
+      9Γûò use Illuminate\Foundation\Auth\User as Authenticatable;
+     10Γûò use Illuminate\Notifications\Notifiable;
+     11Γûò use Laravel\Sanctum\HasApiTokens;
+     12Γûò 
+  Γ₧£  13Γûò class User extends Authenticatable
+     14Γûò {
+     15Γûò     /** @use HasFactory<UserFactory> */
+     16Γûò     use HasApiTokens, HasFactory, Notifiable;
+     17Γûò
+
+
+   Whoops\Exception\ErrorException 
+
+  Trait "Laravel\Sanctum\HasApiTokens" not found
+
+  at app\Models\User.php:13
+      9Γûò use Illuminate\Foundation\Auth\User as Authenticatable;
+     10Γûò use Illuminate\Notifications\Notifiable;
+     11Γûò use Laravel\Sanctum\HasApiTokens;
+     12Γûò 
+  Γ₧£  13Γûò class User extends Authenticatable
+     14Γûò {
+     15Γûò     /** @use HasFactory<UserFactory> */
+     16Γûò     use HasApiTokens, HasFactory, Notifiable;
+     17Γûò
+
+  1   vendor\filp\whoops\src\Whoops\Run.php:520
+      Whoops\Run::handleError("Trait "Laravel\Sanctum\HasApiTokens" not found", "C:\xampp\htdocs\SI-INDAH\backend\app\Models\User.php")
+
+  2   [internal]:0
+      Whoops\Run::handleShutdown()
+
