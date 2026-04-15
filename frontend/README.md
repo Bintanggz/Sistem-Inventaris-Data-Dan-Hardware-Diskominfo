@@ -1,16 +1,36 @@
-# React + Vite
+# Frontend SiINDAH (Antarmuka Pengguna)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Ini adalah direktori **Frontend** untuk aplikasi Sistem Inventaris Data dan Hardware (SiINDAH), dibangun menggunakan React 19, Tailwind CSS v4, dan dikelola oleh _build tool_ modern, Vite.
 
-Currently, two official plugins are available:
+## 🚀 Teknologi Utama
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Vite** untuk proses *development* dan *build* yang cepat.
+- **React.js 19** untuk membuat komponen UI (*User Interface*).
+- **Tailwind CSS 4** sebagai *utility-first* framework untuk mendesain secara modern.
+- **React Router v7** untuk mengatur navigasi halaman (seperti Locations, Mutations, Reports).
+- **Axios** digunakan saat menghubungkan frontend secara asinkron dengan _RESTful API_ backend Laravel.
+- **Recharts** untuk membuat visualisasi analitik data dinamis pada Dashboard.
 
-## React Compiler
+## 💻 Panduan Menjalankan
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Langkah mudah untuk mulai mengembangkan di lokal:
 
-## Expanding the ESLint configuration
+1. Modifikasi atau buat file `.env` berdasarkan spesifikasi lingkungan lokal. Anda perlu memastikan bahwa _baseURL_ menunjuk lurus ke API Backend (biasanya `http://localhost:8000/api`).
+2. Instal semua dependensi:
+   ```bash
+   npm install
+   ```
+3. Mulai server pengembangan:
+   ```bash
+   npm run dev
+   ```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Aplikasi frontend biasanya akan berjalan di [http://localhost:5173/](http://localhost:5173/).
+
+## 🔧 Build untuk Produksi
+
+Jika siap untuk membuat rilis *production-ready*:
+```bash
+npm run build
+```
+File siap pakai tersebut akan dihasilkan pada folder `dist/` dan dapat Anda hubungkan ke folder `public/` web server Anda (misal `Nginx` atau `Apache`/Apache bawaan Laravel).
