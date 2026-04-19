@@ -20,6 +20,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role_id',
+        'avatar',
     ];
 
     protected $hidden = [
@@ -53,5 +54,13 @@ class User extends Authenticatable
     public function hasRole(string ...$roles): bool
     {
         return in_array($this->role->name, $roles);
+    }
+
+    /** URL lengkap avatar, null jika belum ada */
+    public function getAvatarUrlAttribute(): ?string
+    {
+        return $this->avatar
+            ? asset('storage/' . $this->avatar)
+            : null;
     }
 }

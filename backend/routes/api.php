@@ -22,6 +22,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
     Route::put('/user/profile', [AuthController::class, 'updateProfile']);
+    Route::post('/user/profile', [AuthController::class, 'updateProfile']); // method spoofing untuk multipart
     Route::put('/user/password', [AuthController::class, 'changePassword']);
 
     // Dashboard
@@ -64,7 +65,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:admin')->group(function () {
         Route::get('/users', [UserController::class, 'index']);
         Route::post('/users', [UserController::class, 'store']);
-        Route::put('/users/{user}', [UserController::class, 'update']);
+        Route::post('/users/{user}', [UserController::class, 'update']); // POST + _method=PUT untuk file upload
         Route::delete('/users/{user}', [UserController::class, 'destroy']);
         Route::get('/roles', [UserController::class, 'roles']);
     });

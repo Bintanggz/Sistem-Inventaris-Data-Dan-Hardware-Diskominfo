@@ -83,13 +83,23 @@ export const getActivityLogs = (params) => api.get('/activity-logs', { params })
 
 // User Management (admin only)
 export const getUsers = (params) => api.get('/users', { params });
-export const createUser = (data) => api.post('/users', data);
-export const updateUser = (id, data) => api.put(`/users/${id}`, data);
+export const createUser = (data) => api.post('/users', data, { headers: { 'Content-Type': 'multipart/form-data' } });
+export const updateUser = (id, data) => api.post(`/users/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } });
 export const deleteUser = (id) => api.delete(`/users/${id}`);
 export const getRoles = () => api.get('/roles');
 
 // Profile & Password
-export const updateProfile = (data) => api.put('/user/profile', data);
+// Gunakan POST + _method=PUT karena PUT tidak mendukung multipart/form-data di beberapa server
+export const updateProfile = (data) => {
+  const formData = new FormData();
+  Object.keys(data).forEach((key) => {
+    if (data[key] !== null && data[key] !== undefined) {
+      formData.append(key, data[key]);
+    }
+  });
+  formData.append('_method', 'PUT');
+  return api.post('/user/profile', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+};
 export const changePassword = (data) => api.put('/user/password', data);
 
 export default api;

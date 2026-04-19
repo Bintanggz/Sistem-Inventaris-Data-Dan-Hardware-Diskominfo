@@ -130,8 +130,14 @@ export default function Sidebar({ collapsed, setCollapsed, onMenuClick, classNam
       <div className="border-t border-white/[0.06] p-3 flex-shrink-0">
         {!collapsed && (
           <div className="flex items-center gap-3 mb-3 px-1 animate-fade-in">
-            <div className="w-8 h-8 rounded-lg bg-accent-500/20 flex items-center justify-center flex-shrink-0">
-              <span className="text-[11px] text-accent-400 font-bold">{initials}</span>
+            <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0 ring-1 ring-white/10">
+              {user?.avatar_url ? (
+                <img src={user.avatar_url} alt={user.name} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-accent-500/20 flex items-center justify-center">
+                  <span className="text-[11px] text-accent-400 font-bold">{initials}</span>
+                </div>
+              )}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-white text-[13px] font-medium truncate">{user?.name}</p>

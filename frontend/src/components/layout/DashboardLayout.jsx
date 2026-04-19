@@ -74,8 +74,14 @@ export default function DashboardLayout() {
               </button>
 
               <div className="hidden sm:flex items-center gap-2.5 pl-3 ml-1.5 border-l border-gray-200/80">
-                <div className="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center">
-                  <span className="text-[11px] text-white font-bold">{initials}</span>
+                <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0 ring-1 ring-gray-900/5">
+                  {user?.avatar_url ? (
+                    <img src={user.avatar_url} alt={user.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-primary-500 flex items-center justify-center">
+                      <span className="text-[11px] text-white font-bold">{initials}</span>
+                    </div>
+                  )}
                 </div>
                 <div className="hidden md:block">
                   <p className="text-[13px] font-semibold text-gray-800 leading-tight">{user?.name}</p>

@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -41,11 +42,12 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Login berhasil',
             'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'role' => $user->role->name,
+                'id'           => $user->id,
+                'name'         => $user->name,
+                'email'        => $user->email,
+                'role'         => $user->role->name,
                 'role_display' => $user->role->display_name,
+                'avatar_url'   => $user->avatar_url,
             ],
             'token' => $token,
         ]);
@@ -71,11 +73,12 @@ class AuthController extends Controller
         $user = $request->user()->load('role');
 
         return response()->json([
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'role' => $user->role->name,
+            'id'           => $user->id,
+            'name'         => $user->name,
+            'email'        => $user->email,
+            'role'         => $user->role->name,
             'role_display' => $user->role->display_name,
+            'avatar_url'   => $user->avatar_url,
         ]);
     }
 
@@ -84,11 +87,20 @@ class AuthController extends Controller
         $user = $request->user();
 
         $validated = $request->validate([
-            'name'  => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
+            'name'   => 'required|string|max:255',
+            'email'  => 'required|email|unique:users,email,' . $user->id,
+            'avatar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         $oldValues = $user->toArray();
+
+        if ($request->hasFile('avatar')) {
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+            $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
+        }
+
         $user->update($validated);
 
         ActivityLog::log('update', 'User', $user->id, $oldValues, $user->fresh()->toArray(), 'Memperbarui profil');
@@ -101,6 +113,7 @@ class AuthController extends Controller
                 'email'        => $user->email,
                 'role'         => $user->role->name,
                 'role_display' => $user->role->display_name,
+                'avatar_url'   => $user->avatar_url,
             ],
         ]);
     }
