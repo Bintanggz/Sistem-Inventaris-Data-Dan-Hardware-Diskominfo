@@ -81,4 +81,15 @@ export const exportExcel = (params) => api.get('/reports/items/excel', { params,
 // Activity Logs
 export const getActivityLogs = (params) => api.get('/activity-logs', { params });
 
+// User Management (admin only)
+export const getUsers = (params) => api.get('/users', { params });
+export const createUser = (data) => api.post('/users', data);
+export const updateUser = (id, data) => api.put(`/users/${id}`, data);
+export const deleteUser = (id) => api.delete(`/users/${id}`);
+export const getRoles = () => api.get('/roles');
+
+// Profile & Password
+export const updateProfile = (data) => api.put('/user/profile', data);
+export const changePassword = (data) => api.put('/user/password', data);
+
 export default api;

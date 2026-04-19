@@ -78,4 +78,50 @@ class AuthController extends Controller
             'role_display' => $user->role->display_name,
         ]);
     }
+
+    public function updateProfile(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'name'  => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+        ]);
+
+        $oldValues = $user->toArray();
+        $user->update($validated);
+
+        ActivityLog::log('update', 'User', $user->id, $oldValues, $user->fresh()->toArray(), 'Memperbarui profil');
+
+        return response()->json([
+            'message' => 'Profil berhasil diperbarui',
+            'user' => [
+                'id'           => $user->id,
+                'name'         => $user->name,
+                'email'        => $user->email,
+                'role'         => $user->role->name,
+                'role_display' => $user->role->display_name,
+            ],
+        ]);
+    }
+
+    public function changePassword(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'current_password' => 'required',
+            'password'         => 'required|min:6|confirmed',
+        ]);
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json(['message' => 'Password lama tidak sesuai'], 422);
+        }
+
+        $user->update(['password' => Hash::make($request->password)]);
+
+        ActivityLog::log('update', 'User', $user->id, null, null, 'Mengganti password');
+
+        return response()->json(['message' => 'Password berhasil diubah']);
+    }
 }

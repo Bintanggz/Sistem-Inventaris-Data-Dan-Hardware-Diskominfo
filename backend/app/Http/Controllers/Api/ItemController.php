@@ -52,6 +52,9 @@ class ItemController extends Controller
             'acquisition_date' => 'nullable|date',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'serial_number_device' => 'nullable|string|max:255',
+            'procurement_method' => 'nullable|string|in:Pengadaan,Pemeliharaan',
+            'status' => 'nullable|string|in:Terpasang,Backup,Idle',
         ]);
 
         $validated['code'] = Item::generateCode();
@@ -88,6 +91,9 @@ class ItemController extends Controller
             'acquisition_date' => 'nullable|date',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'serial_number_device' => 'nullable|string|max:255',
+            'procurement_method' => 'nullable|string|in:Pengadaan,Pemeliharaan',
+            'status' => 'nullable|string|in:Terpasang,Backup,Idle',
         ]);
 
         $oldValues = $item->toArray();

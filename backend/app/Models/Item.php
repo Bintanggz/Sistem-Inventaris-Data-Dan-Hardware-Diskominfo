@@ -11,7 +11,8 @@ class Item extends Model
     protected $fillable = [
         'name', 'code', 'category_id', 'location_id',
         'quantity', 'condition', 'acquisition_date',
-        'description', 'image',
+        'description', 'image', 'serial_number_device',
+        'procurement_method', 'status',
     ];
 
     protected function casts(): array

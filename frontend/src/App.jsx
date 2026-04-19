@@ -12,6 +12,8 @@ import Mutations from './pages/Mutations';
 import Maintenance from './pages/Maintenance';
 import Reports from './pages/Reports';
 import ActivityLog from './pages/ActivityLog';
+import Users from './pages/Users';
+import Profile from './pages/Profile';
 
 function ProtectedRoute({ children, roles }) {
   const { user, loading } = useAuth();
@@ -56,6 +58,8 @@ function AppRoutes() {
         <Route path="maintenance" element={<Maintenance />} />
         <Route path="reports" element={<ProtectedRoute roles={['admin','petugas']}><Reports /></ProtectedRoute>} />
         <Route path="activity-log" element={<ProtectedRoute roles={['admin']}><ActivityLog /></ProtectedRoute>} />
+        <Route path="users" element={<ProtectedRoute roles={['admin']}><Users /></ProtectedRoute>} />
+        <Route path="profile" element={<Profile />} />
       </Route>
     </Routes>
   );

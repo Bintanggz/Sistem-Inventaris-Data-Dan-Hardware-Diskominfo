@@ -49,20 +49,16 @@ class ReportController extends Controller
 
         $items = $query->orderBy('code')->get();
 
-        $csvData = "Kode,Nama Barang,Kategori,Lokasi,Jumlah,Kondisi,Tanggal Perolehan,Deskripsi\n";
-        foreach ($items as $item) {
-            $condition = match($item->condition) {
-                'baik' => 'Baik',
-                'rusak_ringan' => 'Rusak Ringan',
-                'rusak_berat' => 'Rusak Berat',
-                'hilang' => 'Hilang',
-                default => $item->condition,
-            };
-            $csvData .= "\"{$item->code}\",\"{$item->name}\",\"{$item->category->name}\",\"{$item->location->name}\",{$item->quantity},\"{$condition}\",\"{$item->acquisition_date?->format('Y-m-d')}\",\"{$item->description}\"\n";
+        $csvData = "No,Kategori Barang,Merk / Type,Serial Number Device,Tgl Barang Masuk,Metode Pengadaan,Status Barang,Lokasi Barang,Umur Barang (th),Sisa Umur (th),Kondisi Barang,Keterangan\n";
+        foreach ($items as $index => $item) {
+            $age = $item->acquisition_date ? (int) abs(now()->diffInYears($item->acquisition_date)) : 0;
+            $remaining = 5 - $age;
+            $kondisi = $age <= 3 ? 'Masih Baik' : ($age <= 5 ? 'Siap Rencana Pengadaan' : 'Disarankan Ganti');
+            $csvData .= ($index + 1) . ",\"{$item->category->name}\",\"{$item->name}\",\"{$item->serial_number_device}\",\"{$item->acquisition_date?->format('d/m/Y')}\",\"{$item->procurement_method}\",\"{$item->status}\",\"{$item->location->name}\",{$age},{$remaining},\"{$kondisi}\",\"{$item->description}\"\n";
         }
 
         return response($csvData)
-            ->header('Content-Type', 'text/csv')
+            ->header('Content-Type', 'text/csv; charset=UTF-8')
             ->header('Content-Disposition', 'attachment; filename="laporan-inventaris-' . date('Y-m-d') . '.csv"');
     }
 }

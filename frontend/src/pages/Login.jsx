@@ -132,16 +132,6 @@ export default function Login() {
                 )}
               </button>
             </form>
-
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-100">
-              <p className="text-xs text-gray-500 font-semibold mb-2">Akun Demo:</p>
-              <div className="space-y-1 text-xs text-gray-500">
-                <p><span className="font-medium text-gray-600">Admin:</span> admin@siindah.go.id</p>
-                <p><span className="font-medium text-gray-600">Petugas:</span> petugas@siindah.go.id</p>
-                <p><span className="font-medium text-gray-600">Viewer:</span> viewer@siindah.go.id</p>
-                <p className="text-gray-400 pt-1">Password: password</p>
-              </div>
-            </div>
           </div>
         </div>
       </div>

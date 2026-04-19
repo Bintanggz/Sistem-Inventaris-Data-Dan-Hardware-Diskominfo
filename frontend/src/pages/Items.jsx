@@ -25,7 +25,7 @@ export default function Items() {
   const [editItem, setEditItem] = useState(null);
   const [filters, setFilters] = useState({ search: '', category_id: '', location_id: '', condition: '', page: 1 });
 
-  const [form, setForm] = useState({ name: '', category_id: '', location_id: '', quantity: 1, condition: 'baik', acquisition_date: '', description: '', image: null });
+  const [form, setForm] = useState({ name: '', category_id: '', location_id: '', quantity: 1, condition: 'baik', acquisition_date: '', description: '', image: null, serial_number_device: '', procurement_method: 'Pengadaan', status: 'Terpasang' });
 
   const loadItems = async () => {
     setLoading(true);
@@ -48,7 +48,7 @@ export default function Items() {
   useEffect(() => { loadItems(); }, [filters]);
 
   const resetForm = () => {
-    setForm({ name: '', category_id: '', location_id: '', quantity: 1, condition: 'baik', acquisition_date: '', description: '', image: null });
+    setForm({ name: '', category_id: '', location_id: '', quantity: 1, condition: 'baik', acquisition_date: '', description: '', image: null, serial_number_device: '', procurement_method: 'Pengadaan', status: 'Terpasang' });
     setEditItem(null);
   };
 
@@ -62,6 +62,9 @@ export default function Items() {
       acquisition_date: item.acquisition_date || '',
       description: item.description || '',
       image: null,
+      serial_number_device: item.serial_number_device || '',
+      procurement_method: item.procurement_method || 'Pengadaan',
+      status: item.status || 'Terpasang',
     });
     setEditItem(item);
     setModalOpen(true);
@@ -147,44 +150,53 @@ export default function Items() {
         <div className="overflow-x-auto">
           <table className="w-full data-table">
             <thead>
-              <tr className="border-b border-gray-200/60">
-                <th className="text-left">Kode</th>
-                <th className="text-left">Nama</th>
-                <th className="text-left hidden md:table-cell">Kategori</th>
-                <th className="text-left hidden lg:table-cell">Lokasi</th>
-                <th className="text-center">Qty</th>
-                <th className="text-center">Kondisi</th>
-                <th className="text-center">Aksi</th>
+              <tr className="border-b border-gray-200/60 whitespace-nowrap">
+                <th className="text-center px-4 py-3">No</th>
+                <th className="text-left px-4 py-3">Kategori Barang</th>
+                <th className="text-left px-4 py-3">Merk / Type</th>
+                <th className="text-left px-4 py-3">Serial Number Device</th>
+                <th className="text-left px-4 py-3">Tanggal Barang Masuk</th>
+                <th className="text-left px-4 py-3">Metode Pengadaan</th>
+                <th className="text-left px-4 py-3">Status Barang</th>
+                <th className="text-left px-4 py-3">Lokasi Barang</th>
+                <th className="text-center px-4 py-3">Umur Barang (th)</th>
+                <th className="text-center px-4 py-3">Sisa Umur (th)</th>
+                <th className="text-center px-4 py-3">Kondisi Barang</th>
+                <th className="text-left px-4 py-3">Keterangan</th>
+                <th className="text-center px-4 py-3">Aksi</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={7}><SkeletonTable rows={5} cols={6} /></td></tr>
+                <tr><td colSpan={13}><SkeletonTable rows={5} cols={13} /></td></tr>
               ) : items.length === 0 ? (
-                <tr><td colSpan={7}>
+                <tr><td colSpan={13}>
                   <EmptyState icon={HiOutlineCube} title="Tidak ada barang" description="Belum ada data barang yang sesuai filter" />
                 </td></tr>
-              ) : items.map((item) => (
-                <tr key={item.id}>
-                  <td className="text-sm font-mono text-accent-600 font-medium">{item.code}</td>
-                  <td>
-                    <div className="flex items-center gap-3">
-                      {item.image ? (
-                        <img src={item.image} alt="" className="w-9 h-9 rounded-lg object-cover ring-1 ring-gray-200" />
-                      ) : (
-                        <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
-                          <HiOutlineCube className="w-4 h-4 text-gray-300" />
-                        </div>
-                      )}
-                      <span className="text-sm font-medium text-gray-800">{item.name}</span>
-                    </div>
+              ) : items.map((item, index) => (
+                <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50/50 whitespace-nowrap">
+                  <td className="text-sm font-medium text-gray-500 text-center px-4 py-3">{(filters.page - 1) * 10 + index + 1}</td>
+                  <td className="text-sm text-gray-600 px-4 py-3">{item.category.name}</td>
+                  <td className="text-sm font-medium text-gray-800 px-4 py-3">{item.name}</td>
+                  <td className="text-sm font-mono text-gray-500 px-4 py-3">{item.serial_number_device || '-'}</td>
+                  <td className="text-sm text-gray-600 px-4 py-3">{item.acquisition_date || '-'}</td>
+                  <td className="text-sm text-gray-600 px-4 py-3">{item.procurement_method || '-'}</td>
+                  <td className="px-4 py-3">
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${item.status === 'Terpasang' ? 'bg-green-100 text-green-700' : item.status === 'Backup' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                      {item.status || '-'}
+                    </span>
                   </td>
-                  <td className="text-sm text-gray-500 hidden md:table-cell">{item.category.name}</td>
-                  <td className="text-sm text-gray-500 hidden lg:table-cell">{item.location.name}</td>
-                  <td className="text-sm text-center font-medium text-gray-700">{item.quantity}</td>
-                  <td className="text-center"><ConditionBadge condition={item.condition} /></td>
-                  <td>
-                    <div className="flex items-center justify-center gap-0.5">
+                  <td className="text-sm text-gray-600 px-4 py-3">{item.location.name}</td>
+                  <td className="text-sm text-center text-gray-700 px-4 py-3">{item.umur_barang}</td>
+                  <td className="text-sm text-center text-gray-700 px-4 py-3">{item.sisa_umur_barang}</td>
+                  <td className="px-4 py-3 text-center">
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${item.kondisi_barang === 'Masih Baik' ? 'bg-green-100 text-green-700' : item.kondisi_barang === 'Siap Rencana Pengadaan' ? 'bg-orange-100 text-orange-800' : 'bg-red-100 text-red-700'}`}>
+                      {item.kondisi_barang}
+                    </span>
+                  </td>
+                  <td className="text-sm text-gray-500 max-w-[200px] truncate px-4 py-3" title={item.description}>{item.description || '-'}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-center gap-1">
                       <button onClick={() => setDetailModal(item)} className="p-1.5 hover:bg-blue-50 rounded-lg text-gray-400 hover:text-blue-600 transition" title="Detail"><HiOutlineEye className="w-4 h-4" /></button>
                       {hasRole('admin', 'petugas') && (
                         <button onClick={() => openEdit(item)} className="p-1.5 hover:bg-amber-50 rounded-lg text-gray-400 hover:text-amber-600 transition" title="Edit"><HiOutlinePencil className="w-4 h-4" /></button>
@@ -215,14 +227,26 @@ export default function Items() {
               <option value="">Pilih lokasi</option>
               {locations.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
             </SelectField>
-            <InputField label="Jumlah" required type="number" min={1} value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} />
-            <SelectField label="Kondisi" required value={form.condition} onChange={(e) => setForm({ ...form, condition: e.target.value })}>
-              <option value="baik">Baik</option>
-              <option value="rusak_ringan">Rusak Ringan</option>
-              <option value="rusak_berat">Rusak Berat</option>
-              <option value="hilang">Hilang</option>
+            <InputField label="Serial Number Device" type="text" value={form.serial_number_device} onChange={(e) => setForm({ ...form, serial_number_device: e.target.value })} />
+            <SelectField label="Metode Pengadaan" value={form.procurement_method} onChange={(e) => setForm({ ...form, procurement_method: e.target.value })}>
+              <option value="Pengadaan">Pengadaan</option>
+              <option value="Pemeliharaan">Pemeliharaan</option>
             </SelectField>
-            <InputField label="Tanggal Perolehan" type="date" value={form.acquisition_date} onChange={(e) => setForm({ ...form, acquisition_date: e.target.value })} />
+            <SelectField label="Status Barang" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
+              <option value="Terpasang">Terpasang</option>
+              <option value="Backup">Backup</option>
+              <option value="Idle">Idle</option>
+            </SelectField>
+            <InputField label="Jumlah (Qty)" required type="number" min={1} value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} />
+            <InputField label="Tanggal Barang Masuk" type="date" required value={form.acquisition_date} onChange={(e) => setForm({ ...form, acquisition_date: e.target.value })} />
+            <div className="hidden">
+              <SelectField label="Kondisi Fisik" required value={form.condition} onChange={(e) => setForm({ ...form, condition: e.target.value })}>
+                <option value="baik">Baik</option>
+                <option value="rusak_ringan">Rusak Ringan</option>
+                <option value="rusak_berat">Rusak Berat</option>
+                <option value="hilang">Hilang</option>
+              </SelectField>
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Gambar</label>
               <input type="file" accept="image/*" onChange={(e) => setForm({ ...form, image: e.target.files[0] })} className="w-full text-sm text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 transition" />
@@ -245,11 +269,16 @@ export default function Items() {
               {[
                 { label: 'Kode', value: <span className="font-mono text-accent-600 font-medium">{detailModal.code}</span> },
                 { label: 'Nama', value: detailModal.name },
+                { label: 'Serial Number', value: detailModal.serial_number_device || '-' },
                 { label: 'Kategori', value: detailModal.category.name },
                 { label: 'Lokasi', value: detailModal.location.name },
+                { label: 'Metode Pengadaan', value: detailModal.procurement_method || '-' },
+                { label: 'Status Barang', value: detailModal.status || '-' },
+                { label: 'Tanggal Masuk', value: detailModal.acquisition_date || '-' },
+                { label: 'Umur Barang', value: detailModal.umur_barang + ' tahun' },
+                { label: 'Sisa Umur', value: detailModal.sisa_umur_barang + ' tahun' },
+                { label: 'Kondisi Barang', value: <span className="font-medium text-blue-600">{detailModal.kondisi_barang}</span> },
                 { label: 'Jumlah', value: detailModal.quantity },
-                { label: 'Kondisi', value: <ConditionBadge condition={detailModal.condition} /> },
-                { label: 'Tanggal Perolehan', value: detailModal.acquisition_date || '-' },
                 { label: 'Terakhir Diubah', value: detailModal.updated_at },
               ].map((item) => (
                 <div key={item.label}>

@@ -12,6 +12,8 @@ import {
   HiOutlineClock,
   HiOutlineChevronLeft,
   HiOutlineLogout,
+  HiOutlineUsers,
+  HiOutlineUser,
 } from 'react-icons/hi';
 import logoImg from '../../assets/kominfologosiindah.png';
 
@@ -43,6 +45,7 @@ const menuSections = [
     items: [
       { path: '/reports', icon: HiOutlineDocumentReport, label: 'Laporan', roles: ['admin', 'petugas'] },
       { path: '/activity-log', icon: HiOutlineClock, label: 'Log Aktivitas', roles: ['admin'] },
+      { path: '/users', icon: HiOutlineUsers, label: 'Manajemen User', roles: ['admin'] },
     ]
   },
 ];
@@ -138,6 +141,15 @@ export default function Sidebar({ collapsed, setCollapsed, onMenuClick, classNam
         )}
 
         <div className="flex items-center gap-1">
+          <Link
+            to="/profile"
+            onClick={onMenuClick}
+            className="flex items-center gap-2 px-3 py-1.5 text-gray-500 hover:text-gray-200 hover:bg-white/[0.04] rounded-lg text-[13px] transition-all"
+            title="Profil Saya"
+          >
+            <HiOutlineUser className="w-[18px] h-[18px]" />
+            {!collapsed && <span>Profil</span>}
+          </Link>
           <button
             onClick={logout}
             className="flex items-center gap-2 px-3 py-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg text-[13px] transition-all flex-1"
