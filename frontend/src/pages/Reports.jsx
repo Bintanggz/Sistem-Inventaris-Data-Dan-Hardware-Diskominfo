@@ -9,7 +9,7 @@ import { HiOutlineDocumentDownload, HiOutlineTable } from 'react-icons/hi';
 export default function Reports() {
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
-  const [filters, setFilters] = useState({ category_id: '', location_id: '', condition: '' });
+  const [filters, setFilters] = useState({ category_id: '', location_id: '', kondisi_umur: '' });
   const [loading, setLoading] = useState('');
 
   useEffect(() => {
@@ -50,12 +50,11 @@ export default function Reports() {
             <option value="">Semua Lokasi</option>
             {locations.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
           </SelectField>
-          <SelectField value={filters.condition} onChange={(e) => setFilters({...filters, condition: e.target.value})}>
-            <option value="">Semua Kondisi</option>
-            <option value="baik">Baik</option>
-            <option value="rusak_ringan">Rusak Ringan</option>
-            <option value="rusak_berat">Rusak Berat</option>
-            <option value="hilang">Hilang</option>
+          <SelectField value={filters.kondisi_umur} onChange={(e) => setFilters({...filters, kondisi_umur: e.target.value})}>
+            <option value="">Semua Kondisi Umur</option>
+            <option value="masih_baik">Masih Baik (1–3 tahun)</option>
+            <option value="siap_pengadaan">Siap Rencana Pengadaan (4–5 tahun)</option>
+            <option value="disarankan_ganti">Disarankan Ganti (&gt;5 tahun)</option>
           </SelectField>
         </div>
 

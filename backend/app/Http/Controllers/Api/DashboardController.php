@@ -14,22 +14,37 @@ class DashboardController extends Controller
 {
     public function stats(): JsonResponse
     {
+        // Compute age-based condition stats
+        $allItems = Item::whereNotNull('acquisition_date')->get();
+        $masihBaik = 0; $siapPengadaan = 0; $disarankanGanti = 0;
+        foreach ($allItems as $item) {
+            $age = (int) abs(now()->diffInYears($item->acquisition_date));
+            if ($age > 5) $disarankanGanti++;
+            elseif ($age >= 4) $siapPengadaan++;
+            else $masihBaik++;
+        }
+
         return response()->json([
-            'total_items' => Item::count(),
-            'total_categories' => Category::count(),
-            'total_locations' => Location::count(),
-            'total_quantity' => Item::sum('quantity'),
+            'total_items'          => Item::count(),
+            'total_categories'     => Category::count(),
+            'total_locations'      => Location::count(),
+            'total_quantity'       => Item::sum('quantity'),
             'condition_stats' => [
-                'baik' => Item::where('condition', 'baik')->count(),
+                'baik'         => Item::where('condition', 'baik')->count(),
                 'rusak_ringan' => Item::where('condition', 'rusak_ringan')->count(),
-                'rusak_berat' => Item::where('condition', 'rusak_berat')->count(),
-                'hilang' => Item::where('condition', 'hilang')->count(),
+                'rusak_berat'  => Item::where('condition', 'rusak_berat')->count(),
+                'hilang'       => Item::where('condition', 'hilang')->count(),
             ],
-            'active_borrowings' => Borrowing::where('status', 'dipinjam')->count(),
-            'overdue_borrowings' => Borrowing::where('status', 'dipinjam')
+            'age_condition_stats' => [
+                'masih_baik'       => $masihBaik,
+                'siap_pengadaan'   => $siapPengadaan,
+                'disarankan_ganti' => $disarankanGanti,
+            ],
+            'active_borrowings'    => Borrowing::where('status', 'dipinjam')->count(),
+            'overdue_borrowings'   => Borrowing::where('status', 'dipinjam')
                 ->where('due_date', '<', now())
                 ->count(),
-            'active_maintenance' => Maintenance::whereIn('status', ['pending', 'in_progress'])->count(),
+            'active_maintenance'   => Maintenance::whereIn('status', ['pending', 'in_progress'])->count(),
         ]);
     }
 

@@ -21,7 +21,7 @@
 <body>
     <h1>DATA INVENTORY BARANG DISKOMINFO KARANGANYAR</h1>
     <h2>SiINDAH — Sistem Inventaris Data & Hardware</h2>
-    <h2>Dicetak: {{ date('d F Y') }}</h2>
+    <h2>Filter: {{ $kondisiUmurLabel ?? 'Semua Kondisi' }} | Dicetak: {{ date('d F Y') }}</h2>
 
     <table>
         <thead>

@@ -3,6 +3,7 @@ import { getDashboardStats, getDashboardCharts } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import Card, { CardHeader } from '../components/ui/Card';
 import { SkeletonStatCards } from '../components/ui/LoadingSkeleton';
+import CriticalAlertBanner from '../components/ui/CriticalAlertBanner';
 import { HiOutlineCube, HiOutlineTag, HiOutlineLocationMarker, HiOutlineClipboardList, HiOutlineExclamation, HiOutlineCog } from 'react-icons/hi';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 
@@ -31,11 +32,14 @@ function StatCard({ icon: Icon, label, value, color, bg, border }) {
   );
 }
 
-function ConditionCard({ label, value, color, bg }) {
+function AgeConditionCard({ label, value, color, bg, borderColor, description }) {
   return (
-    <div className={`${bg} rounded-xl p-4 border border-gray-100`}>
-      <p className="text-xs text-gray-500 font-medium">{label}</p>
-      <p className={`text-lg font-bold ${color} mt-1`}>{value}</p>
+    <div className={`${bg} rounded-xl p-4 border ${borderColor}`}>
+      <div className="flex items-start justify-between mb-2">
+        <p className="text-xs text-gray-600 font-medium leading-snug max-w-[70%]">{label}</p>
+        <span className={`text-xl font-bold ${color}`}>{value}</span>
+      </div>
+      <p className="text-[10px] text-gray-400">{description}</p>
     </div>
   );
 }
@@ -97,8 +101,10 @@ export default function Dashboard() {
     return 'Selamat Malam';
   };
 
+  const ageStats = stats?.age_condition_stats;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Greeting */}
       <div>
         <h1 className="text-lg font-semibold text-gray-900 tracking-tight">
@@ -106,6 +112,12 @@ export default function Dashboard() {
         </h1>
         <p className="text-[13px] text-gray-500 mt-0.5">Ringkasan data inventaris hari ini</p>
       </div>
+
+      {/* 🔴 Critical Alert Banners */}
+      <CriticalAlertBanner
+        overdueCount={stats?.overdue_borrowings || 0}
+        criticalItemsCount={ageStats?.disarankan_ganti || 0}
+      />
 
       {/* Stat Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 stagger-in">
@@ -122,12 +134,58 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Condition cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <ConditionCard label="Baik" value={stats?.condition_stats?.baik || 0} color="text-emerald-600" bg="bg-emerald-50/50" />
-        <ConditionCard label="Rusak Ringan" value={stats?.condition_stats?.rusak_ringan || 0} color="text-amber-600" bg="bg-amber-50/50" />
-        <ConditionCard label="Rusak Berat" value={stats?.condition_stats?.rusak_berat || 0} color="text-rose-600" bg="bg-rose-50/50" />
-        <ConditionCard label="Hilang" value={stats?.condition_stats?.hilang || 0} color="text-gray-600" bg="bg-gray-50" />
+      {/* Physical condition cards */}
+      <div>
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Kondisi Fisik Barang</p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="bg-emerald-50/50 rounded-xl p-4 border border-emerald-100">
+            <p className="text-xs text-gray-500 font-medium">Baik</p>
+            <p className="text-lg font-bold text-emerald-600 mt-1">{stats?.condition_stats?.baik || 0}</p>
+          </div>
+          <div className="bg-amber-50/50 rounded-xl p-4 border border-amber-100">
+            <p className="text-xs text-gray-500 font-medium">Rusak Ringan</p>
+            <p className="text-lg font-bold text-amber-600 mt-1">{stats?.condition_stats?.rusak_ringan || 0}</p>
+          </div>
+          <div className="bg-rose-50/50 rounded-xl p-4 border border-rose-100">
+            <p className="text-xs text-gray-500 font-medium">Rusak Berat</p>
+            <p className="text-lg font-bold text-rose-600 mt-1">{stats?.condition_stats?.rusak_berat || 0}</p>
+          </div>
+          <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+            <p className="text-xs text-gray-500 font-medium">Hilang</p>
+            <p className="text-lg font-bold text-gray-600 mt-1">{stats?.condition_stats?.hilang || 0}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* 🟡 Age-based condition section */}
+      <div>
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Kondisi Barang Berdasarkan Umur</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <AgeConditionCard
+            label="Masih Baik"
+            value={ageStats?.masih_baik || 0}
+            color="text-emerald-600"
+            bg="bg-emerald-50/60"
+            borderColor="border-emerald-200"
+            description="Umur 1–3 tahun, kondisi optimal"
+          />
+          <AgeConditionCard
+            label="Siap Rencana Pengadaan"
+            value={ageStats?.siap_pengadaan || 0}
+            color="text-orange-600"
+            bg="bg-orange-50/60"
+            borderColor="border-orange-200"
+            description="Umur 4–5 tahun, perlu direncanakan pengganti"
+          />
+          <AgeConditionCard
+            label="Disarankan Ganti"
+            value={ageStats?.disarankan_ganti || 0}
+            color="text-rose-600"
+            bg="bg-rose-50/60"
+            borderColor="border-rose-200"
+            description="Umur >5 tahun, prioritas pengadaan"
+          />
+        </div>
       </div>
 
       {/* Charts */}
@@ -147,13 +205,21 @@ export default function Dashboard() {
         </Card>
 
         <Card>
-          <CardHeader title="Kondisi Barang" subtitle="Distribusi kondisi inventaris" />
+          <CardHeader title="Kondisi Barang (Umur)" subtitle="Distribusi kondisi berdasarkan umur" />
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
-              <Pie data={charts?.conditions || []} cx="50%" cy="50%" outerRadius={88} innerRadius={52} dataKey="value" nameKey="name" strokeWidth={2} stroke="#fff">
-                {(charts?.conditions || []).map((_, idx) => (
-                  <Cell key={idx} fill={COLORS[idx % COLORS.length]} />
-                ))}
+              <Pie
+                data={[
+                  { name: 'Masih Baik', value: ageStats?.masih_baik || 0 },
+                  { name: 'Siap Pengadaan', value: ageStats?.siap_pengadaan || 0 },
+                  { name: 'Disarankan Ganti', value: ageStats?.disarankan_ganti || 0 },
+                ]}
+                cx="50%" cy="50%" outerRadius={88} innerRadius={52}
+                dataKey="value" nameKey="name" strokeWidth={2} stroke="#fff"
+              >
+                <Cell fill="#10b981" />
+                <Cell fill="#f97316" />
+                <Cell fill="#ef4444" />
               </Pie>
               <Tooltip content={<CustomTooltip />} />
               <Legend iconType="circle" iconSize={7} wrapperStyle={{ fontSize: '11px', fontWeight: 500 }} />

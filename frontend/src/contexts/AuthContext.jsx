@@ -42,12 +42,21 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  // Dipanggil setelah user memperbarui profil — update React state & localStorage tanpa reload
+  const updateUser = (updatedFields) => {
+    setUser((prev) => {
+      const newUser = { ...prev, ...updatedFields };
+      localStorage.setItem('user', JSON.stringify(newUser));
+      return newUser;
+    });
+  };
+
   const hasRole = (...roles) => {
     return user && roles.includes(user.role);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading, hasRole }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, hasRole, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

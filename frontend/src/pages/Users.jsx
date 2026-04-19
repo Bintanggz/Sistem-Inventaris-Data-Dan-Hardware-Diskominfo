@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { getUsers, getRoles, createUser, updateUser, deleteUser } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import Modal from '../components/ui/Modal';
+import ConfirmModal from '../components/ui/ConfirmModal';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import PageHeader from '../components/ui/PageHeader';
@@ -39,6 +40,7 @@ export default function Users() {
   const [filters, setFilters] = useState({ search: '', page: 1 });
   const [form, setForm] = useState({ name: '', email: '', role_id: '', password: '', password_confirmation: '' });
   const [errors, setErrors] = useState({});
+  const [confirmModal, setConfirmModal] = useState({ open: false, user: null, loading: false });
 
   const loadUsers = async () => {
     setLoading(true);
@@ -95,14 +97,20 @@ export default function Users() {
     }
   };
 
-  const handleDelete = async (u) => {
-    if (!confirm(`Hapus user "${u.name}"? Aksi ini tidak dapat dibatalkan.`)) return;
+  const handleDelete = (u) => {
+    setConfirmModal({ open: true, user: u, loading: false });
+  };
+
+  const confirmDelete = async () => {
+    setConfirmModal(prev => ({ ...prev, loading: true }));
     try {
-      await deleteUser(u.id);
+      await deleteUser(confirmModal.user.id);
       toast.success('User berhasil dihapus');
+      setConfirmModal({ open: false, user: null, loading: false });
       loadUsers();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Gagal menghapus user');
+      setConfirmModal(prev => ({ ...prev, loading: false }));
     }
   };
 
@@ -246,6 +254,17 @@ export default function Users() {
           </div>
         </form>
       </Modal>
+
+      {/* Confirm Delete Modal */}
+      <ConfirmModal
+        isOpen={confirmModal.open}
+        onClose={() => setConfirmModal({ open: false, user: null, loading: false })}
+        onConfirm={confirmDelete}
+        loading={confirmModal.loading}
+        title="Hapus User"
+        message={`Apakah Anda yakin ingin menghapus user "${confirmModal.user?.name}"? Semua data terkait user ini akan ikut terhapus.`}
+        confirmLabel="Ya, Hapus"
+      />
     </div>
   );
 }

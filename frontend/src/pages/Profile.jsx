@@ -15,7 +15,7 @@ const ROLE_STYLE = {
 };
 
 export default function Profile() {
-  const { user, login } = useAuth();
+  const { user, updateUser } = useAuth();
   const [profileForm, setProfileForm] = useState({ name: user?.name || '', email: user?.email || '' });
   const [pwForm, setPwForm] = useState({ current_password: '', password: '', password_confirmation: '' });
   const [profileLoading, setProfileLoading] = useState(false);
@@ -31,12 +31,10 @@ export default function Profile() {
     setProfileLoading(true);
     try {
       const res = await updateProfile(profileForm);
-      // Update stored user in localStorage
-      const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-      const updatedUser = { ...storedUser, ...res.data.user };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      // Force auth context refresh without full logout
-      window.dispatchEvent(new Event('user-updated'));
+      // ✅ Update React state langsung — nama & email di sidebar/header langsung berubah
+      updateUser(res.data.user);
+      // Sync form supaya nilai terbaru tampil
+      setProfileForm({ name: res.data.user.name, email: res.data.user.email });
       toast.success('Profil berhasil diperbarui');
     } catch (err) {
       const data = err.response?.data;

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { getItems, getCategories, getLocations, createItem, updateItem, deleteItem } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import Modal from '../components/ui/Modal';
+import ConfirmModal from '../components/ui/ConfirmModal';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import PageHeader from '../components/ui/PageHeader';
@@ -23,9 +24,10 @@ export default function Items() {
   const [modalOpen, setModalOpen] = useState(false);
   const [detailModal, setDetailModal] = useState(null);
   const [editItem, setEditItem] = useState(null);
-  const [filters, setFilters] = useState({ search: '', category_id: '', location_id: '', condition: '', page: 1 });
+  const [filters, setFilters] = useState({ search: '', category_id: '', location_id: '', kondisi_umur: '', page: 1 });
 
   const [form, setForm] = useState({ name: '', category_id: '', location_id: '', quantity: 1, condition: 'baik', acquisition_date: '', description: '', image: null, serial_number_device: '', procurement_method: 'Pengadaan', status: 'Terpasang' });
+  const [confirmModal, setConfirmModal] = useState({ open: false, item: null, loading: false });
 
   const loadItems = async () => {
     setLoading(true);
@@ -96,13 +98,19 @@ export default function Items() {
   };
 
   const handleDelete = async (item) => {
-    if (!confirm(`Hapus barang "${item.name}"?`)) return;
+    setConfirmModal({ open: true, item, loading: false });
+  };
+
+  const confirmDelete = async () => {
+    setConfirmModal(prev => ({ ...prev, loading: true }));
     try {
-      await deleteItem(item.id);
+      await deleteItem(confirmModal.item.id);
       toast.success('Barang berhasil dihapus');
+      setConfirmModal({ open: false, item: null, loading: false });
       loadItems();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Gagal menghapus');
+      setConfirmModal(prev => ({ ...prev, loading: false }));
     }
   };
 
@@ -135,12 +143,14 @@ export default function Items() {
             <option value="">Semua Lokasi</option>
             {locations.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
           </SelectField>
-          <SelectField value={filters.condition} onChange={(e) => setFilters({ ...filters, condition: e.target.value, page: 1 })}>
-            <option value="">Semua Kondisi</option>
-            <option value="baik">Baik</option>
-            <option value="rusak_ringan">Rusak Ringan</option>
-            <option value="rusak_berat">Rusak Berat</option>
-            <option value="hilang">Hilang</option>
+          <SelectField
+            value={filters.kondisi_umur}
+            onChange={(e) => setFilters({ ...filters, kondisi_umur: e.target.value, page: 1 })}
+          >
+            <option value="">Semua Kondisi Umur</option>
+            <option value="masih_baik">Masih Baik (1-3 th)</option>
+            <option value="siap_pengadaan">Siap Rencana Pengadaan (4-5 th)</option>
+            <option value="disarankan_ganti">Disarankan Ganti (&gt;5 th)</option>
           </SelectField>
         </div>
       </Card>
@@ -296,6 +306,17 @@ export default function Items() {
           </div>
         )}
       </Modal>
+
+      {/* Confirm Delete Modal */}
+      <ConfirmModal
+        isOpen={confirmModal.open}
+        onClose={() => setConfirmModal({ open: false, item: null, loading: false })}
+        onConfirm={confirmDelete}
+        loading={confirmModal.loading}
+        title="Hapus Barang"
+        message={`Apakah Anda yakin ingin menghapus barang "${confirmModal.item?.name}"? Aksi ini tidak dapat dibatalkan.`}
+        confirmLabel="Ya, Hapus"
+      />
     </div>
   );
 }

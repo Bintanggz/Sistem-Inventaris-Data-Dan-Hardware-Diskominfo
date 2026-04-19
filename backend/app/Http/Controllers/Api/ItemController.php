@@ -36,6 +36,21 @@ class ItemController extends Controller
             $query->where('condition', $request->condition);
         }
 
+        // Filter berdasarkan kondisi umur barang (dihitung dari acquisition_date)
+        if ($request->filled('kondisi_umur')) {
+            $now = now();
+            match ($request->kondisi_umur) {
+                'masih_baik'       => $query->whereNotNull('acquisition_date')
+                                            ->where('acquisition_date', '>=', $now->copy()->subYears(3)->toDateString()),
+                'siap_pengadaan'   => $query->whereNotNull('acquisition_date')
+                                            ->where('acquisition_date', '<', $now->copy()->subYears(3)->toDateString())
+                                            ->where('acquisition_date', '>=', $now->copy()->subYears(5)->toDateString()),
+                'disarankan_ganti' => $query->whereNotNull('acquisition_date')
+                                            ->where('acquisition_date', '<', $now->copy()->subYears(5)->toDateString()),
+                default => null,
+            };
+        }
+
         $items = $query->orderBy('created_at', 'desc')->paginate($request->per_page ?? 10);
 
         return ItemResource::collection($items);

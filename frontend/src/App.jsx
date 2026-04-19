@@ -14,6 +14,8 @@ import Reports from './pages/Reports';
 import ActivityLog from './pages/ActivityLog';
 import Users from './pages/Users';
 import Profile from './pages/Profile';
+import NotFound from './pages/NotFound';
+import Unauthorized from './pages/Unauthorized';
 
 function ProtectedRoute({ children, roles }) {
   const { user, loading } = useAuth();
@@ -28,7 +30,7 @@ function ProtectedRoute({ children, roles }) {
     </div>
   );
   if (!user) return <Navigate to="/login" />;
-  if (roles && !roles.includes(user.role)) return <Navigate to="/" />;
+  if (roles && !roles.includes(user.role)) return <Navigate to="/403" />;
   return children;
 }
 
@@ -61,6 +63,8 @@ function AppRoutes() {
         <Route path="users" element={<ProtectedRoute roles={['admin']}><Users /></ProtectedRoute>} />
         <Route path="profile" element={<Profile />} />
       </Route>
+      <Route path="/403" element={<Unauthorized />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }
