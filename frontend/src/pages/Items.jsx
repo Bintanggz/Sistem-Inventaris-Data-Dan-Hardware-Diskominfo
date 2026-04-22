@@ -26,7 +26,7 @@ export default function Items() {
   const [editItem, setEditItem] = useState(null);
   const [filters, setFilters] = useState({ search: '', category_id: '', location_id: '', kondisi_umur: '', page: 1 });
 
-  const [form, setForm] = useState({ name: '', category_id: '', location_id: '', quantity: 1, condition: 'baik', acquisition_date: '', description: '', image: null, serial_number_device: '', procurement_method: 'Pengadaan', status: 'Terpasang' });
+  const [form, setForm] = useState({ name: '', brand_type: '', category_id: '', location_id: '', quantity: 1, condition: 'baik', acquisition_date: '', description: '', image: null, serial_number_device: '', procurement_method: 'Pengadaan', status: 'Terpasang' });
   const [confirmModal, setConfirmModal] = useState({ open: false, item: null, loading: false });
 
   const loadItems = async () => {
@@ -50,13 +50,14 @@ export default function Items() {
   useEffect(() => { loadItems(); }, [filters]);
 
   const resetForm = () => {
-    setForm({ name: '', category_id: '', location_id: '', quantity: 1, condition: 'baik', acquisition_date: '', description: '', image: null, serial_number_device: '', procurement_method: 'Pengadaan', status: 'Terpasang' });
+    setForm({ name: '', brand_type: '', category_id: '', location_id: '', quantity: 1, condition: 'baik', acquisition_date: '', description: '', image: null, serial_number_device: '', procurement_method: 'Pengadaan', status: 'Terpasang' });
     setEditItem(null);
   };
 
   const openEdit = (item) => {
     setForm({
       name: item.name,
+      brand_type: item.brand_type || '',
       category_id: item.category.id,
       location_id: item.location.id,
       quantity: item.quantity,
@@ -163,6 +164,7 @@ export default function Items() {
               <tr className="border-b border-gray-200/60 whitespace-nowrap">
                 <th className="text-center px-4 py-3">No</th>
                 <th className="text-left px-4 py-3">Kategori Barang</th>
+                <th className="text-left px-4 py-3">Nama Barang</th>
                 <th className="text-left px-4 py-3">Merk / Type</th>
                 <th className="text-left px-4 py-3">Serial Number Device</th>
                 <th className="text-left px-4 py-3">Tanggal Barang Masuk</th>
@@ -188,6 +190,7 @@ export default function Items() {
                   <td className="text-sm font-medium text-gray-500 text-center px-4 py-3">{(filters.page - 1) * 10 + index + 1}</td>
                   <td className="text-sm text-gray-600 px-4 py-3">{item.category.name}</td>
                   <td className="text-sm font-medium text-gray-800 px-4 py-3">{item.name}</td>
+                  <td className="text-sm text-gray-600 px-4 py-3">{item.brand_type || '-'}</td>
                   <td className="text-sm font-mono text-gray-500 px-4 py-3">{item.serial_number_device || '-'}</td>
                   <td className="text-sm text-gray-600 px-4 py-3">{item.acquisition_date || '-'}</td>
                   <td className="text-sm text-gray-600 px-4 py-3">{item.procurement_method || '-'}</td>
@@ -227,8 +230,9 @@ export default function Items() {
       {/* Add/Edit Modal */}
       <Modal isOpen={modalOpen} onClose={() => { setModalOpen(false); resetForm(); }} title={editItem ? 'Edit Barang' : 'Tambah Barang'} size="lg">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <InputField label="Nama Barang" required className="sm:col-span-2" type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
+            <InputField label="Nama Barang" required type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            <InputField label="Merk / Type" type="text" value={form.brand_type} onChange={(e) => setForm({ ...form, brand_type: e.target.value })} />
             <SelectField label="Kategori" required value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })}>
               <option value="">Pilih kategori</option>
               {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -279,6 +283,7 @@ export default function Items() {
               {[
                 { label: 'Kode', value: <span className="font-mono text-accent-600 font-medium">{detailModal.code}</span> },
                 { label: 'Nama', value: detailModal.name },
+                { label: 'Merk / Type', value: detailModal.brand_type || '-' },
                 { label: 'Serial Number', value: detailModal.serial_number_device || '-' },
                 { label: 'Kategori', value: detailModal.category.name },
                 { label: 'Lokasi', value: detailModal.location.name },

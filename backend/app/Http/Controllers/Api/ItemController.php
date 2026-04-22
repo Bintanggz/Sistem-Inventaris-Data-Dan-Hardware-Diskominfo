@@ -20,6 +20,7 @@ class ItemController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('brand_type', 'like', "%{$search}%")
                   ->orWhere('code', 'like', "%{$search}%");
             });
         }
@@ -60,6 +61,7 @@ class ItemController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'brand_type' => 'nullable|string|max:255',
             'category_id' => 'required|exists:categories,id',
             'location_id' => 'required|exists:locations,id',
             'quantity' => 'required|integer|min:1',
@@ -99,6 +101,7 @@ class ItemController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'brand_type' => 'nullable|string|max:255',
             'category_id' => 'required|exists:categories,id',
             'location_id' => 'required|exists:locations,id',
             'quantity' => 'required|integer|min:1',

@@ -144,11 +144,18 @@ export default function Borrowings() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <SelectField label="Barang" required value={form.item_id} onChange={(e) => setForm({ ...form, item_id: e.target.value })}>
             <option value="">Pilih barang</option>
-            {items.map((i) => <option key={i.id} value={i.id}>{i.code} — {i.name}</option>)}
+            {items.map((i) => <option key={i.id} value={i.id}>{i.code} — {i.name} (Stok: {i.quantity})</option>)}
           </SelectField>
           <InputField label="Nama Peminjam" required type="text" value={form.borrower_name} onChange={(e) => setForm({ ...form, borrower_name: e.target.value })} />
           <div className="grid grid-cols-3 gap-4">
-            <InputField label="Jumlah" type="number" min={1} value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} />
+            <div>
+              <InputField label="Jumlah" type="number" min={1} value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} />
+              {form.item_id && (
+                <p className="text-[10px] text-gray-500 mt-1">
+                  Maks: {items.find(i => i.id == form.item_id)?.quantity || 0}
+                </p>
+              )}
+            </div>
             <InputField label="Tgl Pinjam" required type="date" value={form.borrow_date} onChange={(e) => setForm({ ...form, borrow_date: e.target.value })} />
             <InputField label="Jatuh Tempo" required type="date" value={form.due_date} onChange={(e) => setForm({ ...form, due_date: e.target.value })} />
           </div>

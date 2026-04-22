@@ -8,6 +8,7 @@ use App\Models\ActivityLog;
 use App\Models\Borrowing;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BorrowingController extends Controller
 {
@@ -43,17 +44,30 @@ class BorrowingController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $validated['user_id'] = $request->user()->id;
-        $validated['status'] = 'dipinjam';
+        return DB::transaction(function () use ($validated, $request) {
+            $item = \App\Models\Item::lockForUpdate()->find($validated['item_id']);
 
-        $borrowing = Borrowing::create($validated);
+            if ($item->quantity < $validated['quantity']) {
+                return response()->json([
+                    'message' => "Stok tidak mencukupi (Tersedia: {$item->quantity})",
+                ], 422);
+            }
 
-        ActivityLog::log('create', 'Borrowing', $borrowing->id, null, $borrowing->toArray(), "Peminjaman barang: {$borrowing->item->name} oleh {$borrowing->borrower_name}");
+            $validated['user_id'] = $request->user()->id;
+            $validated['status'] = 'dipinjam';
 
-        return response()->json([
-            'message' => 'Peminjaman berhasil dicatat',
-            'data' => new BorrowingResource($borrowing->load(['item', 'user'])),
-        ], 201);
+            $borrowing = Borrowing::create($validated);
+
+            // Decrement item quantity
+            $item->decrement('quantity', $validated['quantity']);
+
+            ActivityLog::log('create', 'Borrowing', $borrowing->id, null, $borrowing->toArray(), "Peminjaman barang: {$borrowing->item->name} oleh {$borrowing->borrower_name}");
+
+            return response()->json([
+                'message' => 'Peminjaman berhasil dicatat',
+                'data' => new BorrowingResource($borrowing->load(['item', 'user'])),
+            ], 201);
+        });
     }
 
     public function returnItem(Request $request, Borrowing $borrowing): JsonResponse
@@ -62,17 +76,23 @@ class BorrowingController extends Controller
             return response()->json(['message' => 'Barang sudah dikembalikan sebelumnya'], 422);
         }
 
-        $oldValues = $borrowing->toArray();
-        $borrowing->update([
-            'return_date' => now()->toDateString(),
-            'status' => 'dikembalikan',
-        ]);
+        return DB::transaction(function () use ($borrowing) {
+            $oldValues = $borrowing->toArray();
+            
+            $borrowing->update([
+                'return_date' => now()->toDateString(),
+                'status' => 'dikembalikan',
+            ]);
 
-        ActivityLog::log('update', 'Borrowing', $borrowing->id, $oldValues, $borrowing->fresh()->toArray(), "Pengembalian barang: {$borrowing->item->name} oleh {$borrowing->borrower_name}");
+            // Increment item quantity back
+            $borrowing->item()->increment('quantity', $borrowing->quantity);
 
-        return response()->json([
-            'message' => 'Barang berhasil dikembalikan',
-            'data' => new BorrowingResource($borrowing->load(['item', 'user'])),
-        ]);
+            ActivityLog::log('update', 'Borrowing', $borrowing->id, $oldValues, $borrowing->fresh()->toArray(), "Pengembalian barang: {$borrowing->item->name} oleh {$borrowing->borrower_name}");
+
+            return response()->json([
+                'message' => 'Barang berhasil dikembalikan',
+                'data' => new BorrowingResource($borrowing->load(['item', 'user'])),
+            ]);
+        });
     }
 }

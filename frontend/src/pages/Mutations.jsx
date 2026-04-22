@@ -107,14 +107,21 @@ export default function Mutations() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <SelectField label="Barang" required value={form.item_id} onChange={(e) => setForm({ ...form, item_id: e.target.value })}>
             <option value="">Pilih barang</option>
-            {items.map((i) => <option key={i.id} value={i.id}>{i.code} — {i.name} ({i.location.name})</option>)}
+            {items.map((i) => <option key={i.id} value={i.id}>{i.code} — {i.name} ({i.location.name} · Stok: {i.quantity})</option>)}
           </SelectField>
           <SelectField label="Lokasi Tujuan" required value={form.to_location_id} onChange={(e) => setForm({ ...form, to_location_id: e.target.value })}>
             <option value="">Pilih lokasi tujuan</option>
             {locations.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
           </SelectField>
           <div className="grid grid-cols-2 gap-4">
-            <InputField label="Jumlah" type="number" min={1} value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} />
+            <div>
+              <InputField label="Jumlah" type="number" min={1} value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} />
+              {form.item_id && (
+                <p className="text-[10px] text-gray-500 mt-1">
+                  Maks: {items.find(i => i.id == form.item_id)?.quantity || 0}
+                </p>
+              )}
+            </div>
             <InputField label="Tanggal" required type="date" value={form.mutation_date} onChange={(e) => setForm({ ...form, mutation_date: e.target.value })} />
           </div>
           <TextareaField label="Alasan" rows={2} value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} />

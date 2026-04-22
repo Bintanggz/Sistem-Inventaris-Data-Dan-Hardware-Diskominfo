@@ -37,6 +37,10 @@ class MutationController extends Controller
 
         $item = Item::findOrFail($validated['item_id']);
 
+        if ($validated['quantity'] > $item->quantity) {
+            return response()->json(['message' => "Jumlah mutasi melebihi stok tersedia ({$item->quantity})"], 422);
+        }
+
         if ($validated['to_location_id'] == $item->location_id) {
             return response()->json(['message' => 'Lokasi tujuan harus berbeda dari lokasi saat ini'], 422);
         }
