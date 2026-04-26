@@ -21,10 +21,21 @@ export default function ActivityLog() {
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    setLoading(true);
-    getActivityLogs({ page })
-      .then(res => { setLogs(res.data.data); setMeta(res.data); })
-      .finally(() => setLoading(false));
+    let isMounted = true;
+    const fetchLogs = async () => {
+      setLoading(true);
+      try {
+        const res = await getActivityLogs({ page });
+        if (isMounted) {
+          setLogs(res.data.data);
+          setMeta(res.data);
+        }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+    fetchLogs();
+    return () => { isMounted = false; };
   }, [page]);
 
   return (

@@ -9,17 +9,19 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token) {
-      getUser()
-        .then((res) => setUser(res.data))
-        .catch(() => {
+    const loadUser = async () => {
+      if (token) {
+        try {
+          const res = await getUser();
+          setUser(res.data);
+        } catch (error) {
           localStorage.removeItem('token');
           localStorage.removeItem('user');
-        })
-        .finally(() => setLoading(false));
-    } else {
+        }
+      }
       setLoading(false);
-    }
+    };
+    loadUser();
   }, []);
 
   const login = async (email, password) => {
@@ -34,7 +36,7 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     try {
       await logoutApi();
-    } catch (e) {
+    } catch (error) {
       // ignore
     }
     localStorage.removeItem('token');
