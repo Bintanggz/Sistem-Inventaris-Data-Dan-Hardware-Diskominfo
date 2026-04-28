@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { HiOutlineExclamation, HiOutlineTrash, HiOutlineX } from 'react-icons/hi';
+import { createPortal } from 'react-dom';
 import Button from './Button';
 
 /**
@@ -38,7 +39,7 @@ export default function ConfirmModal({
 
   const isDanger = variant === 'danger';
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
@@ -85,6 +86,7 @@ export default function ConfirmModal({
           </Button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
